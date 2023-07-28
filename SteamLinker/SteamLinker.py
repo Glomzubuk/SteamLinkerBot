@@ -130,7 +130,7 @@ async def on_message(message):
 
     if match:
         # Extract the duration and duration type from the match
-        duration = int(match.group(1)) if match.group(1) else 30
+        duration = int(match.group(1)) if match.group(1) else 60
         duration_type = match.group(2).lower() if match.group(2) else "min"
 
         print (duration_type)
