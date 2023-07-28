@@ -36,6 +36,22 @@ TEMPURL_PUBLIC_KEY = config.TEMPURL_PUBLIC_KEY
 TEMPURL_PRIVATE_KEY = config.TEMPURL_PRIVATE_KEY
 TEMPURL_API_URL = 'https://www.temporary-url.com/api/v1/'
 
+# Function to convert the specified amount and time unit to an epoch Unix timestamp
+def parse_time_to_epoch(amount, time_unit):
+    time_unit = time_unit.lower()
+
+    if time_unit not in ("min", "hr"):
+        raise ValueError("Invalid time unit. Please use 'min' or 'hr'.")
+
+    # Convert the time unit to minutes
+    if time_unit == "hr":
+        amount *= 60
+
+    # Calculate the epoch Unix timestamp for the specified time from now
+    timestamp = int(time.time()) + amount * 60
+
+    return timestamp
+
 def refill_tokens():
     global tokens, last_refill_time
     now = time.time()
@@ -45,7 +61,7 @@ def refill_tokens():
         tokens = MAX_CALLS_PER_MINUTE
         last_refill_time = now
 
-def shorten_url(url):
+def shorten_url(url, duration, duration_type):
     global tokens, total_calls_today, today
 
     if tokens <= 0:
@@ -67,8 +83,8 @@ def shorten_url(url):
         'type': 'URL',
         'targetURL': url,
         'expirationType': 'duration',
-        'duration': 30,
-        'durationType': 'MINUTE'
+        'duration': duration,
+        'durationType': duration_type
     }
 
     data_json = json.dumps(data)
@@ -108,33 +124,97 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    steam_link_pattern = re.compile(r'^steam:\/\/joinlobby', re.IGNORECASE)
-    if steam_link_pattern.match(message.content):
-        shortened_url = shorten_url(message.content)
+    # Regular expression pattern to match a steam link with optional duration value and duration type
+    steam_link_pattern = re.compile(r'^steam:\/\/joinlobby\/\d+\/\d+\/\d+(?:\s+(\d+)\s*(\w+))?', re.IGNORECASE)
+    match = steam_link_pattern.match(message.content)
+
+    if match:
+        # Extract the duration and duration type from the match
+        duration = int(match.group(1)) if match.group(1) else 30
+        duration_type = match.group(2).lower() if match.group(2) else "min"
+
+        print (duration_type)
+
+        # Validate duration type
+        valid_duration_types = ["min", "hr"]
+        if duration_type not in valid_duration_types:
+            sent_message = await message.channel.send(f"Invalid duration type. Please use one of the following: {', '.join(valid_duration_types)}.")
+            # Store the original author ID and the bot's message ID for later reference
+            message_data = {
+                'original_author_id': message.author.id,
+                'bot_message_id': sent_message.id
+            }
+            # Save the message_data dictionary using the bot's message ID as the key
+            stored_messages[message.id] = message_data
+            await bot.process_commands(message)
+            return
+        elif duration_type == "min":
+            duration_type_api = "MINUTE"
+        elif duration_type == "hr":
+            duration_type_api = "HOUR"
+            
+        
+        # Validate duration range (1 to 180 minutes)
+        if not 1 <= duration <= 180:
+            sent_message = await message.channel.send("Invalid duration. Please enter a value between 1 and 180.")
+            # Store the original author ID and the bot's message ID for later reference
+            message_data = {
+                'original_author_id': message.author.id,
+                'bot_message_id': sent_message.id
+            }
+            # Save the message_data dictionary using the bot's message ID as the key
+            stored_messages[message.id] = message_data
+            await bot.process_commands(message)
+            return
+
+        # Get the steam link
+        steam_link = message.content.split(' ')[0]
+
+        # Call the shorten_url function with the steam link and duration
+        shortened_url = shorten_url(steam_link, duration, duration_type_api)
+
         if "Daily API call limit exceeded" in shortened_url:
-            await message.channel.send("Sorry, the daily API call limit has been exceeded. Try again in a day.")
+            sent_message = await message.channel.send("Sorry, the daily API call limit has been exceeded. Try again in a day.")
+            # Store the original author ID and the bot's message ID for later reference
+            message_data = {
+                'original_author_id': message.author.id,
+                'bot_message_id': sent_message.id
+            }
+            # Save the message_data dictionary using the bot's message ID as the key
+            stored_messages[message.id] = message_data
+            await bot.process_commands(message)
+            return
             
         elif "Minute API call limit exceeded" in shortened_url:
-            await message.channel.send("Sorry, the minute API call limit has been exceeded. Try again in a minute.")
+            sent_message = await message.channel.send("Sorry, the minute API call limit has been exceeded. Try again in a minute.")
+            # Store the original author ID and the bot's message ID for later reference
+            message_data = {
+                'original_author_id': message.author.id,
+                'bot_message_id': sent_message.id
+            }
+            # Save the message_data dictionary using the bot's message ID as the key
+            stored_messages[message.id] = message_data
+            await bot.process_commands(message)
+            return
 
         elif shortened_url:
+            # Sets the Expiration time to the time given to the API
+            expirationTime = parse_time_to_epoch(duration, duration_type)
+
             # Create a clickable button
             class ButtonView(discord.ui.View):
                 def __init__(self, link: str):
                     super().__init__()
                     self.link = link
                     self.add_item(discord.ui.Button(label='Click Here to Join the Lobby!', url=self.link))
-            sent_message = await message.channel.send(view=ButtonView((str(shortened_url))))
+            sent_message = await message.channel.send("*This is a temporary link. It will expire <t:" + str(expirationTime) + ":R>*", view=ButtonView((str(shortened_url))))
+            
             # Store the original author ID and the bot's message ID for later reference
             message_data = {
                 'original_author_id': message.author.id,
                 'bot_message_id': sent_message.id
             }
-
             # Save the message_data dictionary using the bot's message ID as the key
-            # This can be stored in a database or a dictionary, depending on your needs
-            # For simplicity, we'll use a dictionary in this example
-            # Replace 'stored_messages' with your preferred storage method (e.g., database)
             stored_messages[message.id] = message_data
             
         else:
