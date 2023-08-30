@@ -5,13 +5,13 @@ If you want to create a variant of the bot yourself, you will need a Temporary U
 
 # Usage
 
-![ ](https://github.com/CarterPhan/SteamLinkerBot/tree/main/images/steamlinker.gif)
+![ ](https://github.com/CarterPhan/SteamLinkerBot/blob/main/images/steamlinker.gif)
 
 Simply copy and paste your steam link into any channel that the bot can see, and the bot will put a message underneath with a clickable button!
 
 If you are done with your lobby, feel free to delete the link message. The bot will read this and delete its own message too!
 
-![ ](https://github.com/CarterPhan/SteamLinkerBot/tree/main/images/steamlinkerformat.png)
+![ ](https://github.com/CarterPhan/SteamLinkerBot/blob/main/images/steamlinkerformat.png)
 
 You can also pass parameters into the bot, anywhere from 1 to 180 for a duration and either **min** or **hr** for the duration type. So, something like "steam://joinlobby/.../..../.... 20 hr" would create a clickable button for a temporary link that lasts 20 hours. This is good for people who have long sets with many people coming in and out, so they can control the time that the link is up for. By default the links are up for 4 hours.
 
