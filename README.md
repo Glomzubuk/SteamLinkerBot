@@ -1,5 +1,6 @@
 # SteamLinkerBot
 A Discord bot made in Python that takes a link with a steam header, passes it through a custom github website, and returns a button that contains the link, allowing the user to click and join a lobby without having to copy paste to their browser.
+
 **UPDATE V2.0: No longer using Temporary-URL, and instead using a custom github website, allowing multiple people to use it without any worry for API limits!**
 
 # Usage
