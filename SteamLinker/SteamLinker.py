@@ -60,6 +60,7 @@ async def on_message(message):
                     self.add_item(discord.ui.Button(label='Click Here to Join the Lobby!', url=self.link))
 
             sent_message = await message.channel.send("*Click the button below to access the lobby!*", view=ButtonView(redirection_url))
+            await message.delete()
 
             # Store the original author ID and the bot's message ID for later reference
             message_data = {
