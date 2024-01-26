@@ -11,14 +11,12 @@ intents.messages = True
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-stored_messages = {}
-
 
 class ButtonView(discord.ui.View):
     def __init__(self, link: str):
         super().__init__()
         self.link = link
-        self.add_item(discord.ui.Button(label='Click Here to join the lobby!', url=self.link))
+        self.add_item(discord.ui.Button(label='Click here to join the lobby!', url=self.link))
 
 
 def create_redirection_url(url):
@@ -42,12 +40,8 @@ async def on_message(message):
         redirection_url = create_redirection_url(steam_link)
 
         if redirection_url:
-            sent_message = await message.channel.send(f"*{message.author.name} has created a steam lobby link!*", view=ButtonView(redirection_url))
+            await message.channel.send(f"*{message.author.nick} has created a steam lobby link!*", view=ButtonView(redirection_url))
             await message.delete()
-            stored_messages[message.id] = {
-                'original_author_id': message.author.id,
-                'bot_message_id': sent_message.id
-            }
         else: await message.channel.send(f"Sorry, an error occurred while creating the redirection URL.")
     await bot.process_commands(message)
 
