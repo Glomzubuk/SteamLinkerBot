@@ -14,8 +14,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-COPY ./src/main.py ./
-COPY ./src/config.py ./config.py.tmpl
 COPY ./SteamLinker.sh ./
+COPY ./src/config.py ./config.py.tmpl
+COPY ./src/main.py ./
 
 CMD [ "./SteamLinker.sh" ]
