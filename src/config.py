@@ -1,4 +1,4 @@
 # config.py
 
 # Discord Bot Token
-BOT_TOKEN = 'INSERT BOT TOKEN HERE'
+BOT_TOKEN = '${BOT_TOKEN}'
