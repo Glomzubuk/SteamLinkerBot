@@ -40,7 +40,9 @@ async def on_message(message):
         redirection_url = create_redirection_url(steam_link)
 
         if redirection_url:
-            await message.channel.send(f"{message.author.nick}: {message.content}", view=ButtonView(redirection_url))
+            #await message.channel.send(f"{message.author.nick}: {message.content}", view=ButtonView(redirection_url))
+            await message.channel.send(f"*{message.author.nick} has created a steam lobby link!*\n[{steam_link}]({redirection_url})", view=ButtonView(redirection_url))
+
             await message.delete()
         else: await message.channel.send(f"Sorry, an error occurred while creating the redirection URL.")
     await bot.process_commands(message)
