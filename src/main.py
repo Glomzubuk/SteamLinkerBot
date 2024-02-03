@@ -32,17 +32,25 @@ def create_redirection_url(url):
 async def on_message(message):
     if message.author.bot: return
 
-    steam_link_pattern = re.compile(r'(?:.*?steam:\/\/joinlobby\/\d+\/\d+\/\d+.*?)(?:<@&\d+>)?', re.IGNORECASE)
-    match = steam_link_pattern.search(message.content)
+    steam_link_pattern = re.compile(r'(?:steam:\/\/joinlobby\/\d+\/\d+\/\d+)', re.IGNORECASE)
+    userping_pattern = re.compile(r'(?:<@\d+>)', re.IGNORECASE)
+    steam_match = steam_link_pattern.search(message.content)
+    userping_match = userping_pattern.search(message.content)
 
-    if match:
-        steam_link = match.group(0)
+    if steam_match:
+        steam_link = steam_match.group(0)
         redirection_url = create_redirection_url(steam_link)
 
         if redirection_url:
-            #await message.channel.send(f"{message.author.nick}: {message.content}", view=ButtonView(redirection_url))
             author_name = message.author.nick if message.author.nick else message.author.name
-            await message.channel.send(f"*{author_name} has created a steam lobby link!*\n[{steam_link}]({redirection_url})", view=ButtonView(redirection_url))
+            response  = f"*{author_name} has created a steam lobby link"
+            if userping_match != None:
+                response += f" for {userping_match.group(0)}"
+            response += "!*\n"
+            response += f"[{steam_link}]({redirection_url})"
+            #await message.channel.send(f"{message.author.nick}: {message.content}", view=ButtonView(redirection_url))
+
+            await message.channel.send(response, view=ButtonView(redirection_url))
 
             await message.delete()
         else: await message.channel.send(f"Sorry, an error occurred while creating the redirection URL.")
