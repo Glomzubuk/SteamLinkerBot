@@ -44,15 +44,20 @@ async def on_message(message):
         if redirection_url:
             author_name = message.author.nick if message.author.nick else message.author.name
             response  = f"*{author_name} has created a steam lobby link"
-            if userping_match != None:
-                response += f" for {userping_match.group(0)}"
             response += "!*\n"
             response += f"[{steam_link}]({redirection_url})"
-            #await message.channel.send(f"{message.author.nick}: {message.content}", view=ButtonView(redirection_url))
 
-            await message.channel.send(response, view=ButtonView(redirection_url))
+            sent = await message.channel.send(response, view=ButtonView(redirection_url))
 
             await message.delete()
+
+            if userping_match != None:
+                response  = f"*{author_name} has created a steam lobby link"
+                response += f" for {userping_match.group(0)}"
+                response += "!*\n"
+                response += f"[{steam_link}]({redirection_url})"
+                await sent.edit(content=response, view=ButtonView(redirection_url))
+
         else: await message.channel.send(f"Sorry, an error occurred while creating the redirection URL.")
     await bot.process_commands(message)
 
