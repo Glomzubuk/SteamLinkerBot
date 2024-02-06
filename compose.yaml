@@ -1,0 +1,18 @@
+services:
+  steam-linker:
+    image: steam-linker
+    build: .
+    env_file:
+      - env.list
+    logging:
+      options:
+        max-size: 1m
+        max-file: 2
+        compress: "true"
+    restart: on-failure
+    stop_grace_period: 1s
+    tty: true
+    deploy:
+      resources:
+        limits:
+          memory: 80M
