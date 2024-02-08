@@ -40,11 +40,19 @@ async def on_message(message):
     if steam_match:
         steam_link = steam_match.group(0)
         redirection_url = create_redirection_url(steam_link)
+        no_link = re.sub(steam_match.group(0), "", message.content)
+        if userping_match != None:
+            no_ping = re.sub(userping_match.group(0), "", no_link)
+            extra_text = re.sub("  ", " ", no_ping)
+        else:
+            extra_text = re.sub("  ", " ", no_link)
 
         if redirection_url:
             author_name = message.author.nick if message.author.nick else message.author.name
             response  = f"*{author_name} has created a steam lobby link"
             response += "!*\n"
+            if not extra_text.isspace():
+                response += f"With additional text: *{extra_text}*\n"
             response += f"[{steam_link}]({redirection_url})"
 
             sent = await message.channel.send(response, view=ButtonView(redirection_url))
@@ -55,6 +63,8 @@ async def on_message(message):
                 response  = f"*{author_name} has created a steam lobby link"
                 response += f" for {userping_match.group(0)}"
                 response += "!*\n"
+                if not extra_text.isspace():
+                    response += f"With additional text: *{extra_text}*\n"
                 response += f"[{steam_link}]({redirection_url})"
                 await sent.edit(content=response, view=ButtonView(redirection_url))
 
