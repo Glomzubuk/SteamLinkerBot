@@ -51,8 +51,8 @@ async def on_message(message):
             author_name = message.author.display_name if message.author.display_name else message.author.name
             response  = f"*{author_name} has created a steam lobby link"
             response += "!*\n"
-            if not extra_text.isspace():
-                response += f"With additional text: *{extra_text}*\n"
+            # if not extra_text.isspace():
+            #     response += f"With additional text: *{extra_text.strip()}*\n"
             response += f"[{steam_link}]({redirection_url})"
 
             sent = await message.channel.send(response, view=ButtonView(redirection_url))
