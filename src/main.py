@@ -63,8 +63,8 @@ async def on_message(message):
                 response  = f"*{author_name} has created a steam lobby link"
                 response += f" for {userping_match.group(0)}"
                 response += "!*\n"
-                if not extra_text.isspace():
-                    response += f"With additional text: *{extra_text.strip()}*\n"
+                # if not extra_text.isspace():
+                #     response += f"With additional text: *{extra_text.strip()}*\n"
                 response += f"[{steam_link}]({redirection_url})"
                 await sent.edit(content=response, view=ButtonView(redirection_url))
 
