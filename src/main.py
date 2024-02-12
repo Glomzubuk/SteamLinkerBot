@@ -64,7 +64,7 @@ async def on_message(message):
                 response += f" for {userping_match.group(0)}"
                 response += "!*\n"
                 if not extra_text.isspace():
-                    response += f"With additional text: *{extra_text}*\n"
+                    response += f"With additional text: *{extra_text.strip()}*\n"
                 response += f"[{steam_link}]({redirection_url})"
                 await sent.edit(content=response, view=ButtonView(redirection_url))
 
