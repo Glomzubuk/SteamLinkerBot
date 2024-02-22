@@ -53,7 +53,6 @@ async def on_message(message):
             response += "!*\n"
             # if not extra_text.isspace():
             #     response += f"With additional text: *{extra_text.strip()}*\n"
-            response += f"[{steam_link}]({redirection_url})"
 
             sent = await message.channel.send(response, view=ButtonView(redirection_url))
 
@@ -65,7 +64,6 @@ async def on_message(message):
                 response += "!*\n"
                 # if not extra_text.isspace():
                 #     response += f"With additional text: *{extra_text.strip()}*\n"
-                response += f"[{steam_link}]({redirection_url})"
                 await sent.edit(content=response, view=ButtonView(redirection_url))
 
         else: await message.channel.send(f"Sorry, an error occurred while creating the redirection URL.")
